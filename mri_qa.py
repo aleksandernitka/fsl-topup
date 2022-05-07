@@ -12,23 +12,16 @@ log = logging.getLogger()
 
 
 
-def bet(image,workdir,shell=False):
+def bet(image, shell=False):
     """
     Runs fsl's bet2 on an image and saves the results in workdir
     Args:
         image (str): path to the image to run bet2 on
-        workdir (str): path for bet2 output (used to generate <output_fileroot> option in bet2
-        shell (bool): pass the shell into the bet2 subprocess command
     Returns:
         bet_out (str): path to bet2's <output_fileroot> (currently "workdir"/bet
     """
-
-
-
-    com_cmd = ['{}/fslstats'.format(fsldir), image, '-C']
-
-    print(' '.join(com_cmd))
-    com_cmd = ' '.join(com_cmd)
+    # com_cmd = ['{}/fslstats'.format(fsldir), image, '-C']
+    com_cmd = f'fslstats {image} -C'
 
     result = sp.Popen(com_cmd, stdout=sp.PIPE, stderr=sp.PIPE,
                       universal_newlines=True, shell=shell)
@@ -37,11 +30,11 @@ def bet(image,workdir,shell=False):
     print(out)
     print(err)
     center_of_mass = out.rstrip()
-
-    bet_out = os.path.join(workdir, 'bet')
-    bet_cmd = ['{}/bet2'.format(fsldir), image, bet_out, '-o', '-m', '-t', '-f', '0.5', '-w', '0.4', '-c', center_of_mass]
-    print(' '.join(bet_cmd))
-    bet_cmd = ' '.join(bet_cmd)
+    
+    fout = image.split('.')[0]+'_bet'
+    # bet_cmd = ['{}/bet2'.format(fsldir), image, bet_out, '-o', '-m', '-t', '-f', '0.5', '-w', '0.4', '-c', center_of_mass]
+    bet_cmd = f'bet2 {image} {fout} -o -m -t -f 0.5 -w 0.4 -c {center_of_mass}'
+    
     result = sp.Popen(bet_cmd, stdout=sp.PIPE, stderr=sp.PIPE,
                       universal_newlines=True, shell=shell)
 
